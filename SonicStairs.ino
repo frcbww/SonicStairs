@@ -1,8 +1,10 @@
 double sensor;
-double state;
+bool isInit;
+double lastTime;
 
 void setup() {
-  state = 0;
+  isInit = false;
+  lastTime = 0;
 }
 
 void loop () {
@@ -14,20 +16,27 @@ void loop () {
   digitalWrite(9, LOW);
   pinMode(9, INPUT);
   sensor = pulseIn(9, HIGH);
+  
   if(sensor > 0) {
     sensor = sensor / 2;
     sensor = sensor * 340 * 100 / 1000000;
-    if(sensor < 100){
-      if (state == 0) {
-        state = 1;
-        tone(8, 523.23);
-        delay(1000);
-      } else {
-        noTone(8);
-      }
+    if(sensor < 80){
+      isInit = false;
+      tone(8, 261.63);
     } else {
-      state = 0;
-      noTone(8);
+      if (!isInit) {
+        isInit = true;
+        lastTime = millis();
+      } else {
+        if (millis() - lastTime > 500) {
+          noTone(8);
+        } else {
+          tone(8, 261.63);
+        }
+      }
     }
+//    if(sensor < 80){
+//      tone(8, 261.63, 300);
+//    }
   }
 }
